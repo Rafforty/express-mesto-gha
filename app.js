@@ -22,5 +22,8 @@ app.use((req, res, next) => {
 
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
+app.use('/', (req, res) => {
+  res.send
+})
 
 app.listen(PORT);
