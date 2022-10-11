@@ -16,7 +16,7 @@ module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw NotFoundError404('Пользователь с указанным _id не найден');
+        throw new NotFoundError404('Пользователь с указанным _id не найден');
       }
       res.status(200).send(user);
     })
