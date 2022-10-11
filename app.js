@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
+const auth = require('./middlewares/auth');
+const { validationSignUp, validationSignIn } = require('./middlewares/validation');
+const { login, postUser } = require('./controllers/users');
+const NotFoundError404 = require('./errors/NotFoundError404');
+const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -12,18 +17,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '633201bb624477b43b25f0fd',
-  };
+app.post('/signin', validationSignIn, login);
+app.post('/signup', validationSignUp, postUser);
 
-  next();
-});
+app.use(auth);
 
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
-app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError404('Страница не найдена.'));
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({ message: statusCode === 500 ? 'Произошла ошибка сервера' : message });
+  next();
 });
 
 app.listen(PORT);
