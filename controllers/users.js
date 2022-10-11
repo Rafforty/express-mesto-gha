@@ -108,22 +108,46 @@ module.exports.getUserInfo = (req, res, next) => {
     .catch(next);
 };
 
+// module.exports.login = (req, res, next) => {
+//   const { email, password } = req.body;
+//   User.findUserByCredentials(email, password)
+//     .then((user) => {
+//       const token = jwt.sign({ _id: user._id }, 'dev-secret');
+//       res.cookie('jwt', token, {
+//         maxAge: 3600000 * 24 * 7,
+//         httpOnly: true,
+//       });
+//       res.send({ token });
+//     })
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         next(new UnauthorizedError401('Wrong Email or password'));
+//       } else {
+//         next(err);
+//       }
+//     });
+// };
+
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'dev-secret');
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-      });
-      res.send({ token });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new UnauthorizedError401('Wrong Email or password'));
-      } else {
-        next(err);
+      if (!user) {
+        throw new UnauthorizedError401('Неправильная почта или пароль.');
       }
-    });
+      bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new UnauthorizedError401('Неправильная почта или пароль.');
+          }
+          const token = jwt.sign({ _id: user._id }, 'dev-secret');
+          res.cookie('jwt', token, {
+            maxAge: 3600000 * 24 * 7,
+            httpOnly: true,
+          });
+          res.send({ token });
+        })
+        .catch(next);
+    })
+    .catch(next);
 };
