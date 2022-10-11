@@ -121,7 +121,7 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new UnauthorizedError401('Wrong Email or password'));
+        next(new UnauthorizedError401('Неправильная почта или пароль.'));
       } else {
         next(err);
       }
