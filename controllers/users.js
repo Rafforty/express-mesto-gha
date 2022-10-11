@@ -103,7 +103,7 @@ module.exports.getUserInfo = (req, res, next) => {
       if (!user) {
         throw new NotFoundError404('Пользователь с указанным _id не найден');
       }
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch(next);
 };
