@@ -7,7 +7,7 @@ const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { validationSignUp, validationSignIn } = require('./middlewares/validation');
-const { login, postUser } = require('./controllers/users');
+const { login, createUser } = require('./controllers/users');
 const NotFoundError404 = require('./errors/NotFoundError404');
 
 const { PORT = 3000 } = process.env;
@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.post('/signin', validationSignIn, login);
-app.post('/signup', validationSignUp, postUser);
+app.post('/signup', validationSignUp, createUser);
 
 app.use(auth);
 app.use(errors());
