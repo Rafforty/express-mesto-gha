@@ -33,9 +33,9 @@ module.exports.postUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  // if (!email || !password) {
-  //   throw new BadRequestError400('Неправильные почта или пароль.')
-  // }
+  if (!email || !password) {
+    throw new BadRequestError400('Неправильные почта или пароль.');
+  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
