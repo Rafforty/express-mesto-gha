@@ -1,13 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const auth = require('./middlewares/auth');
 const { validationSignUp, validationSignIn } = require('./middlewares/validation');
 const { login, postUser } = require('./controllers/users');
 const NotFoundError404 = require('./errors/NotFoundError404');
-const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -21,7 +21,7 @@ app.post('/signin', validationSignIn, login);
 app.post('/signup', validationSignUp, postUser);
 
 app.use(auth);
-
+app.use(errors());
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
 app.use('/', (req, res, next) => {
