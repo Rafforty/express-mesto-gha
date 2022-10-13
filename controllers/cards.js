@@ -25,16 +25,15 @@ module.exports.postCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
+    .orFail(() => {
+      throw new NotFoundError404('Карточка с указанным _id не найдена');
+    })
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError404('Карточка с указанным _id не найдена');
-      }
-      if (card.owner.toString() === req.user._id) {
-        res.status(200).send({ data: card });
-      } else {
+      if (!card.owner.toString() === req.user._id) {
         throw new ForbiddenError403('Невозможно удалить чужую карточку.');
       }
+      return card.remove();
     })
     .catch(next);
 };

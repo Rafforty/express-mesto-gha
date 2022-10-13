@@ -47,7 +47,7 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError400(`Проверьте введенные данные. Ошибка - ${err.message}`));
-      } if (err.code === 11000) {
+      } else if (err.code === 11000) {
         next(new ConflictError409('Пользователь с таким Email уже зарегистрирован. Попробуйте другой Email.'));
       } else {
         next(err);
