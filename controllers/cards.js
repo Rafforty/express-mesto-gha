@@ -30,10 +30,10 @@ module.exports.deleteCard = (req, res, next) => {
       throw new NotFoundError404('Карточка с указанным _id не найдена');
     })
     .then((card) => {
-      if (!card.owner.toString() === req.user._id) {
-        throw new ForbiddenError403('Невозможно удалить чужую карточку.');
+      if (card.owner.toString() === req.user._id) {
+        return card.remove();
       }
-      card.remove();
+      throw new ForbiddenError403('Невозможно удалить чужую карточку.');
     })
     .catch(next);
 };
