@@ -34,7 +34,13 @@ module.exports.deleteCard = (req, res, next) => {
       }
       return next(new ForbiddenError403('Невозможно удалить чужую карточку.'));
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError400(`Проверьте введенные данные. Ошибка - ${err.message}`));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
